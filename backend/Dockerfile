@@ -1,11 +1,9 @@
 # backend/Dockerfile
-FROM alpine:3.2
+FROM node:22-alpine
 
-ENV NODE_VERSION 22.13.0
+WORKDIR /api-bancaria
 
-WORKDIR /app
-
-COPY package*.json ./
+COPY package*.json /
 
 RUN npm install
 
