@@ -10,9 +10,9 @@
     "build": "/bin/sh tsc_eval.sh",
     "db:create": "npx sequelize-cli db:drop && npx sequelize-cli db:create",
     "db:reset": "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all",
-    "prestart": "npm run build && npm run db:reset",
+    "prestart": "npm run build && npm run db:create",
     "start": "nodemon --exec ts-node src/server.ts",
-    "predev": "npm run build && npm run db:create",
+    "predev": "npm run build && npm run db:reset",
     "dev": "nodemon --exec ts-node src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
