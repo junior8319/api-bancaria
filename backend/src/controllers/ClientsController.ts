@@ -15,6 +15,17 @@ class ClientsController {
 
     res.status(200).json(clients);
   }
+
+  public getClientById = async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+    const client = await this.clientsService.getClientById(id);
+
+    if (client) {
+      res.status(200).json(client);
+    } else {
+      res.status(404).json({ message: `Client with id ${id} not found` });
+    }
+  }
 }
 
 export default new ClientsController();
