@@ -9,4 +9,5 @@ const clientsRouter = (0, express_1.Router)();
 clientsRouter.get("/clients", ClientsController_1.default.getAllClients);
 clientsRouter.get("/clients/:id", ClientsController_1.default.getClientById);
 clientsRouter.post("/clients", ClientsController_1.default.createClient);
+clientsRouter.post("/login", ClientsController_1.default.login);
 exports.default = clientsRouter;

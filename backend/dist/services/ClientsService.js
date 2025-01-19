@@ -91,13 +91,43 @@ class ClientsService {
                         name: createdClient.dataValues.name
                     }
                 });
-                delete createdClient.dataValues.password;
-                delete createdClient._previousDataValues;
-                delete createdClient.uniqno;
-                delete createdClient._changed;
-                delete createdClient._options;
-                delete createdClient.isNewRecord;
-                return Object.assign(Object.assign({}, createdClient), { token });
+                createdClient = _a.cleanClientData(createdClient);
+                const message = `Cliente cadastrado com sucesso! ID: ${createdClient.dataValues.id}`;
+                return Object.assign(Object.assign({}, createdClient.dataValues), { token, message });
+            }
+            catch (error) {
+                throw new Error(error.message);
+            }
+        });
+        this.login = (clientData) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                if (!clientData || (!clientData.cpf && !clientData.name) || !clientData.password)
+                    return null;
+                if (!clientData.cpf) {
+                    let client = yield Client_1.default.findOne({ where: { name: clientData.name } });
+                    if (!client)
+                        return null;
+                    const passwordMatch = yield bCrypt.compare(clientData.password, client.dataValues.password);
+                    if (!passwordMatch)
+                        return null;
+                    client = _a.cleanClientData(client);
+                    const token = yield this.getToken(client.dataValues);
+                    if (!token)
+                        return null;
+                    return Object.assign(Object.assign({}, client.dataValues), { token });
+                }
+                let client = yield Client_1.default.findOne({ where: { cpf: clientData.cpf } });
+                if (!client)
+                    return null;
+                const passwordMatch = yield bCrypt.compare(clientData.password, client.dataValues.password);
+                if (!passwordMatch)
+                    return null;
+                client = _a.cleanClientData(client);
+                const token = yield this.getToken(client.dataValues);
+                if (!token)
+                    return null;
+                const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
+                return Object.assign(Object.assign({}, client.dataValues), { token, message });
             }
             catch (error) {
                 throw new Error(error.message);
@@ -117,4 +147,13 @@ ClientsService.clientExists = (cpf) => __awaiter(void 0, void 0, void 0, functio
         throw new Error(error.message);
     }
 });
+ClientsService.cleanClientData = (client) => {
+    delete client.dataValues.password;
+    delete client._previousDataValues;
+    delete client.uniqno;
+    delete client._changed;
+    delete client._options;
+    delete client.isNewRecord;
+    return Object.assign({}, client);
+};
 exports.default = ClientsService;

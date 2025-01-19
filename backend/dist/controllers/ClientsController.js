@@ -39,6 +39,16 @@ class ClientsController {
                 res.status(500).json(this.serverErrorMessage);
             }
         });
+        this.login = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const loginData = req.body;
+            const client = yield this.clientsService.login(loginData);
+            if (client) {
+                res.status(200).json(client);
+            }
+            else {
+                res.status(401).json({ message: 'Invalid credentials' });
+            }
+        });
         this.clientsService = new ClientsService_1.default();
     }
 }
