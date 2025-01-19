@@ -1,6 +1,6 @@
 import ClientModel from "../database/models/Client";
 import PixModel from "../database/models/Pix";
-import IClient, { IClientData } from '../interfaces/ClientData';
+import IClient, { IClientData, ILogin } from '../interfaces/ClientData';
 import JsonWebToken from "../helpers/jsonWebToken";
 const bCrypt = require('bcrypt');
 
@@ -59,6 +59,17 @@ class ClientsService {
     }
   }
 
+  static cleanClientData = (client: IClientData): IClientData => {
+    delete client.dataValues.password;
+    delete client._previousDataValues;
+    delete client.uniqno;
+    delete client._changed;
+    delete client._options;
+    delete client.isNewRecord;
+
+    return { ...client };
+  }
+
   public getToken = async (client: IClient): Promise<string | null> => {
     try {
       const clientData = await ClientModel.findOne({ where: { cpf: client.cpf } });
@@ -80,7 +91,7 @@ class ClientsService {
     }
   }
 
-  public createClient = async (clientData: IClient): Promise<IClientData | null> => {
+  public createClient = async (clientData: IClient): Promise<IClient | null> => {
     try {
       if (!clientData || !clientData.cpf) return null;
 
@@ -101,14 +112,53 @@ class ClientsService {
         }
       });
       
-      delete createdClient.dataValues.password;
-      delete createdClient._previousDataValues;
-      delete createdClient.uniqno;
-      delete createdClient._changed;
-      delete createdClient._options;
-      delete createdClient.isNewRecord;
+      createdClient = ClientsService.cleanClientData(createdClient);
 
-      return { ...createdClient, token };
+      const message = `Cliente cadastrado com sucesso! ID: ${createdClient.dataValues.id}`;
+      
+      return { ...createdClient.dataValues, token, message };
+    } catch (error) {
+      throw new Error((error as Error).message);
+    }
+  }
+
+  public login = async (clientData: ILogin): Promise<IClient | null> => {
+    try {
+      if (!clientData || (!clientData.cpf && !clientData.name) || !clientData.password) return null;
+
+      if (!clientData.cpf) {
+        let client: IClientData | null = await ClientModel.findOne({ where: { name: clientData.name } });
+        if (!client) return null;
+
+        
+        const passwordMatch = await bCrypt.compare(clientData.password, client.dataValues.password);
+        if (!passwordMatch) return null;
+        
+        client = ClientsService.cleanClientData(client);
+        
+        const token = await this.getToken(client.dataValues);
+        if (!token) return null;
+
+        const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
+
+        return { ...client.dataValues, token, message };
+      }
+
+      let client: IClientData | null = await ClientModel.findOne({ where: { cpf: clientData.cpf } });
+      if (!client) return null;
+
+      const passwordMatch = await bCrypt.compare(clientData.password, client.dataValues.password);
+      if (!passwordMatch) return null;
+
+      client = ClientsService.cleanClientData(client);
+
+      const token = await this.getToken(client.dataValues);
+      if (!token) return null;
+
+      const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
+
+      return { ...client.dataValues, token, message };
+ 
     } catch (error) {
       throw new Error((error as Error).message);
     }
