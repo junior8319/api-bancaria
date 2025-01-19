@@ -26,6 +26,17 @@ class ClientsController {
       res.status(404).json({ message: `Client with id ${id} not found` });
     }
   }
+
+  public createClient = async (req: Request, res: Response) => {
+    const clientData: IClient = req.body;
+    const client = await this.clientsService.createClient(clientData);
+
+    if (client) {
+      res.status(201).json(client);
+    } else {
+      res.status(500).json(this.serverErrorMessage);
+    }
+  }
 }
 
 export default new ClientsController();
