@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import db from ".";
+import PixModel from "./Pix";
 
 class Client extends Model {
   public id!: number;
@@ -33,5 +34,8 @@ Client.init({
   sequelize: db,
   tableName: "clients"
 });
+
+Client.hasMany(PixModel, { foreignKey: "creditedClientId", as: "receivedPix" });
+Client.hasMany(PixModel, { foreignKey: "payerClientId", as: "paidPix" });
 
 export default Client;

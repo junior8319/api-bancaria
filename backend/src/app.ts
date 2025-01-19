@@ -1,4 +1,5 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
+import { clientsRouter } from './routes/index.routes';
 
 class App {
   public app: express.Express;
@@ -9,10 +10,11 @@ class App {
     this.app.get('/', (_req, res): void => {
       res.send('Hello World')
     });
+    this.app.use(clientsRouter);
   }
 
   private config(): void {
-    const accessControl: express.RequestHandler = (_req, res, next) => {
+    const accessControl: express.RequestHandler = (_req: Request, res: Response, next: NextFunction) => {
       res.header('Access-Control-Allow-Origin', 'http://localhost:3000/clients/*');
       res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
       res.header('Access-Control-Allow-Headers', '*');

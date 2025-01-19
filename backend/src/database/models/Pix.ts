@@ -47,11 +47,11 @@ Pix.init({
 }, {
   underscored: true,
   sequelize: db,
-  tableName: "pixS",
+  tableName: "pix_s",
   modelName: "Pix"
 });
 
-Pix.belongsTo(Client, { foreignKey: "creditedClientId", as: "creditedClient" });
-Pix.belongsTo(Client, { foreignKey: "payerClientId", as: "payerClient" });
+// Pix.belongsTo(Client, { foreignKey: "creditedClientId", as: "creditor" });
+// Pix.belongsTo(Client, { foreignKey: "payerClientId", as: "payer" });
 
 export default Pix;
