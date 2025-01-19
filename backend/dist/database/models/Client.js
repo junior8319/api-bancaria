@@ -33,6 +33,6 @@ Client.init({
     sequelize: _1.default,
     tableName: "clients"
 });
-Client.hasMany(Pix_1.default, { foreignKey: "creditedClientId", as: "creditor" });
-Client.hasMany(Pix_1.default, { foreignKey: "payerClientId", as: "payer" });
+Client.hasMany(Pix_1.default, { foreignKey: "creditedClientId", as: "receivedPix" });
+Client.hasMany(Pix_1.default, { foreignKey: "payerClientId", as: "paidPix" });
 exports.default = Client;

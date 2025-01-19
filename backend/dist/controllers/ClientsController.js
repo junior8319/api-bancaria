@@ -19,6 +19,26 @@ class ClientsController {
             const clients = yield this.clientsService.getAllClients();
             res.status(200).json(clients);
         });
+        this.getClientById = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const id = Number(req.params.id);
+            const client = yield this.clientsService.getClientById(id);
+            if (client) {
+                res.status(200).json(client);
+            }
+            else {
+                res.status(404).json({ message: `Client with id ${id} not found` });
+            }
+        });
+        this.createClient = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const clientData = req.body;
+            const client = yield this.clientsService.createClient(clientData);
+            if (client) {
+                res.status(201).json(client);
+            }
+            else {
+                res.status(500).json(this.serverErrorMessage);
+            }
+        });
         this.clientsService = new ClientsService_1.default();
     }
 }
