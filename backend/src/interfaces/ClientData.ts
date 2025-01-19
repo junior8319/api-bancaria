@@ -1,5 +1,5 @@
 export default interface IClient {
-  id: number
+  id: number;
   name: string;
   cpf: string;
   password?: string;
@@ -20,4 +20,4 @@ export interface IClientData {
   _options?: object;
   isNewRecord?: boolean;
   token?: string | null;
-}    
+}
