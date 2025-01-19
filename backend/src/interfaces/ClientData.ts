@@ -5,6 +5,7 @@ export default interface IClient {
   password?: string;
 
   token?: string | null;
+  message?: string;
 }
 
 export interface IClientData {
@@ -20,4 +21,10 @@ export interface IClientData {
   _options?: object;
   isNewRecord?: boolean;
   token?: string | null;
+}
+
+export interface ILogin {
+  cpf?: string;
+  name?: string;
+  password: string;
 }
