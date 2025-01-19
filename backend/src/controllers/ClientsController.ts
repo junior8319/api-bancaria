@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import ClientsService from "../services/ClientsService";
-import IClient from "../interfaces/ClientData";
+import IClient, { ILogin } from "../interfaces/ClientData";
 
 class ClientsController {
   public clientsService: ClientsService;
@@ -35,6 +35,17 @@ class ClientsController {
       res.status(201).json(client);
     } else {
       res.status(500).json(this.serverErrorMessage);
+    }
+  }
+
+  public login = async (req: Request, res: Response) => {
+    const loginData: ILogin = req.body;
+    const client = await this.clientsService.login(loginData);
+
+    if (client) {
+      res.status(200).json(client);
+    } else {
+      res.status(401).json({ message: 'Invalid credentials' });
     }
   }
 }
