@@ -114,7 +114,8 @@ class ClientsService {
                     const token = yield this.getToken(client.dataValues);
                     if (!token)
                         return null;
-                    return Object.assign(Object.assign({}, client.dataValues), { token });
+                    const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
+                    return Object.assign(Object.assign({}, client.dataValues), { token, message });
                 }
                 let client = yield Client_1.default.findOne({ where: { cpf: clientData.cpf } });
                 if (!client)

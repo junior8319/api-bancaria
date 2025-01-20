@@ -17,7 +17,12 @@ class ClientsController {
     constructor() {
         this.getAllClients = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const clients = yield this.clientsService.getAllClients();
-            res.status(200).json(clients);
+            if (clients && clients.length > 0) {
+                res.status(200).json(clients);
+            }
+            else {
+                res.status(404).json({ message: 'No clients found' });
+            }
         });
         this.getClientById = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const id = Number(req.params.id);
