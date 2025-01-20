@@ -11,9 +11,14 @@ class ClientsController {
   }
 
   public getAllClients = async (req: Request, res: Response) => {
-    const clients = await this.clientsService.getAllClients();
+    const clients = await this.clientsService.getAllClients();    
 
-    res.status(200).json(clients);
+    if (clients && clients.length > 0) {      
+      res.status(200).json(clients);
+    } else {
+      res.status(404).json({ message: 'No clients found' });
+    }
+      
   }
 
   public getClientById = async (req: Request, res: Response) => {
