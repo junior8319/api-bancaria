@@ -1,19 +1,46 @@
+import { useContext } from "react";
+import { ClientData } from "./types/ClientData";
+import ClientsContext from "./context/Contexts.tsx";
+
 const App = () => {
+  const context = useContext(ClientsContext);
+  const clients = context?.clients || [];
+  
   return (
-    <div>
-      <header>
-        <div className="bg-yellow-500">
-          <a
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <p className="text-yellow-700">Este texto deve ter uma cor entre laranja e marrom</p>
-        </div>
-      </header>
-    </div>
+    (clients && clients.length && clients.length > 0)
+    ?
+      <div>
+        <header>
+          <div className="bg-yellow-500">
+            <h1>Lista de Clientes</h1>
+            <ul>
+              {clients.map((client: ClientData) => (
+                <li key={client.id}>
+                  <p>Nome: {client.name}</p>
+                  <p>CPF: {client.cpf}</p>
+                  <ul>
+                    {client.receivedPix.map((pix) => (
+                      <li key={pix.id}>
+                        <p>ID: {pix.id}</p>
+                        <p>Valor: {pix.value}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </header>
+      </div>
+    :
+      <div>
+        <header>
+          <div className="bg-yellow-500">
+            <h1>Lista de Clientes</h1>
+            <p>Nenhum cliente encontrado</p>
+          </div>
+        </header>
+      </div>
   );
 }
 
