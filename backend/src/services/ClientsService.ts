@@ -17,8 +17,26 @@ class ClientsService {
       const clients = await ClientModel.findAll({
         attributes: { exclude: ['password'] },
         include: [
-          { model: PixModel, as: "receivedPix", attributes: ['id', 'value', 'message', 'status'] },
-          { model: PixModel, as: "paidPix", attributes: ['id', 'value', 'message', 'status'] },
+          { model: PixModel, as: "receivedPix", attributes: [
+            'id',
+            'payerClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
+          { model: PixModel, as: "paidPix", attributes: [
+            'id',
+            'creditedClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
         ],
       });
 
@@ -35,8 +53,26 @@ class ClientsService {
       const client: IClient | null = await ClientModel.findByPk(id, {
         attributes: { exclude: ['password'] },
         include: [
-          { model: PixModel, as: "receivedPix", attributes: ['id', 'value', 'message', 'status', 'payerClientId'] },
-          { model: PixModel, as: "paidPix", attributes: ['id', 'value', 'message', 'status', 'creditedClientId'] },
+          { model: PixModel, as: "receivedPix", attributes: [
+            'id',
+            'payerClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
+          { model: PixModel, as: "paidPix", attributes: [
+            'id',
+            'creditedClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
         ],
       });
 
