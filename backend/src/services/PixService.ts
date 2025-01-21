@@ -1,5 +1,5 @@
 import PixModel from "../database/models/Pix";
-import IPix, { IPixData } from "../interfaces/PixData";
+import { IPixData, IPixToSend } from "../interfaces/PixData";
 
 class PixService {
   static pixModel: PixModel;
@@ -8,7 +8,7 @@ class PixService {
     PixService.pixModel = new PixModel();
   }
 
-  public createPix = async (pixData: IPix): Promise<IPixData | null> => {
+  public createPix = async (pixData: IPixToSend): Promise<IPixData | null> => {
     try {
       if (!pixData) return null;
 

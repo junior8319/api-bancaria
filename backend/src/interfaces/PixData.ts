@@ -22,3 +22,12 @@ export interface IPixData {
   };
   returnMessage?: string;
 }
+
+export interface IPixToSend {
+  creditedClientId: number;
+  value: number;
+  pixKey: string;
+  message?: string;
+  status: string;
+  returnMessage?: string;
+} 
