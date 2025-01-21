@@ -1,4 +1,4 @@
-import { ClientData } from "../types/ClientData";
+import { ClientData, PixToSend } from "../types/ClientData.ts";
 
 const API_URL = process.env.REACT_APP_BASE_URL;
 const API_ORIGIN = process.env.REACT_APP_BASE_URL_ORIGIN;
@@ -60,10 +60,107 @@ const requestClientRegister = async (clientData: ClientData) => {
     console.error(error);
     return new Error(`An error occurred while registering client ${error}`);
   }  
-}
+};
+
+const requestClientLogin = async (loginData: { cpf: string, password: string }) => {
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    if (API_ORIGIN) {
+      headers['Access-Control-Allow-Origin'] = API_ORIGIN;
+    }
+
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(loginData),
+      mode: 'cors' as RequestMode,
+      headers,
+    };
+
+    const response = await fetch(`${API_URL}/login`, options)
+    .then((response) => response.json())
+    .then(data => {
+      return data;
+    });
+
+    return response;
+  } catch (error) {
+    console.error(error);
+    return new Error(`An error occurred while logging in ${error}`);
+  }  
+};
+
+const requestSendPix = async (pixData: PixToSend) => {
+  try { 
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': `${localStorage.getItem('client')}`,
+    };
+
+    if (API_ORIGIN) {
+      headers['Access-Control-Allow-Origin'] = API_ORIGIN;
+    }
+
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(pixData),
+      mode: 'cors' as RequestMode,
+      headers,
+    };
+
+    const response = await fetch(`${API_URL}/pix`, options)
+    .then((response) => response.json())
+    .then(data => {
+      return data;
+    });
+
+    return response;
+  } catch (error) {
+    console.error(error);
+    return new Error(`An error occurred while sending pix ${error}`);
+  }
+};
+
+const requestTestTokenIsActive = async (token: string) => {
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': token,
+    };
+
+    if (API_ORIGIN) {
+      headers['Access-Control-Allow-Origin'] = API_ORIGIN;
+    }
+
+    const options = {
+      method: 'POST',
+      mode: 'cors' as RequestMode,
+      headers,
+    };
+
+    const response = await fetch(`${API_URL}/test-token`, options)
+    .then((response) => response.json())
+    .then(data => {
+      return data;
+    });
+
+    return response;
+  } catch (error) {
+    console.error(error);
+    return new Error(`An error occurred while testing token ${error}`);
+  }
+};
 
 export {
   requestGetClients,
   requestGetClientById,
   requestClientRegister,
+  requestClientLogin,
+  requestSendPix,
+  requestTestTokenIsActive
 }
