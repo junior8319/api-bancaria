@@ -4,13 +4,15 @@ services:
   # MySQL Database
   db:
     image: mysql:8.0
-    container_name: mysql_db
+    stdin_open: true
+    tty: true
+    container_name: db
     ports:
-      - "3002:3306"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: banking_api
-      PORT: 3001
+      PORT: 3306
     restart: always
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
@@ -21,6 +23,8 @@ services:
 
   # Backend (Node.js + Express + Sequelize)
   backend:
+    stdin_open: true
+    tty: true
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -32,9 +36,9 @@ services:
         condition: service_healthy
     environment:
       PORT: 3001
-      DB_HOST: db
+      DB_HOST: localhost
       DB_USER: root
-      DB_PASSWORD:
+      DB_PASSWORD: root
       DB_NAME: banking_api
       DB_PORT: 3306
     healthcheck:
@@ -44,3 +48,25 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+
+  # Frontend (React + Tailwind)
+  frontend:
+    stdin_open: true
+    tty: true
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      REACT_APP_BASE_URL: http://localhost:3001
+      REACT_APP_BASE_URL_ORIGIN: http://localhost:3000
+    healthcheck:
+      test: ["CMD", "lsof", "-t", "-i:3000"]
+      timeout: 10s
+      retries: 5
