@@ -44,6 +44,7 @@ class ClientsService {
 
       return clients;
     } catch (error) {
+      console.log(error);      
       throw new Error((error as Error).message);
     }
   }
@@ -51,6 +52,43 @@ class ClientsService {
   public getClientById = async (id: number): Promise<IClient | null> => {
     try {
       const client: IClient | null = await ClientModel.findByPk(id, {
+        attributes: { exclude: ['password'] },
+        include: [
+          { model: PixModel, as: "receivedPix", attributes: [
+            'id',
+            'payerClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
+          { model: PixModel, as: "paidPix", attributes: [
+            'id',
+            'creditedClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
+        ],
+      });
+
+      if (!client) return null;
+
+      return client;
+    } catch (error) {
+      throw new Error((error as Error).message);
+    }
+  }
+
+  public getClientByName = async (name: string): Promise<IClient | null> => {
+    try {
+      const client: IClient | null = await ClientModel.findOne({
+        where: { name },
         attributes: { exclude: ['password'] },
         include: [
           { model: PixModel, as: "receivedPix", attributes: [
@@ -96,7 +134,7 @@ class ClientsService {
   }
 
   static cleanClientData = (client: IClientData): IClientData => {
-    delete client.dataValues.password;
+    delete client.dataValues.password; 
     delete client._previousDataValues;
     delete client.uniqno;
     delete client._changed;
@@ -108,9 +146,34 @@ class ClientsService {
 
   public getToken = async (client: IClient): Promise<string | null> => {
     try {
-      const clientData = await ClientModel.findOne({ where: { cpf: client.cpf } });
+      const clientData = await ClientModel.findOne({
+        where: { cpf: client.cpf },
+        attributes: { exclude: ['password'] },
+        include: [
+          { model: PixModel, as: "receivedPix", attributes: [
+            'id',
+            'payerClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
+          { model: PixModel, as: "paidPix", attributes: [
+            'id',
+            'creditedClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
+        ],
+      });
 
-      if (!clientData) return null;
+      if (!clientData) return null;      
 
       const token: string | null = await JsonWebToken.generate({
         dataValues: {
@@ -152,7 +215,15 @@ class ClientsService {
 
       const message = `Cliente cadastrado com sucesso! ID: ${createdClient.dataValues.id}`;
       
-      return { ...createdClient.dataValues, token, message };
+      return { 
+        dataValues: {
+          id: createdClient.dataValues.id,
+          name: createdClient.dataValues.name,
+          cpf: createdClient.dataValues.cpf,
+        },
+        token,
+        message
+      };
     } catch (error) {
       throw new Error((error as Error).message);
     }
@@ -160,41 +231,71 @@ class ClientsService {
 
   public login = async (clientData: ILogin): Promise<IClient | null> => {
     try {
-      if (!clientData || (!clientData.cpf && !clientData.name) || !clientData.password) return null;
+      if (
+        !clientData ||
+        !clientData.cpf ||
+        !clientData.password ||
+        clientData.cpf.length < 13
+      ) return null;      
 
-      if (!clientData.cpf) {
-        let client: IClientData | null = await ClientModel.findOne({ where: { name: clientData.name } });
-        if (!client) return null;
-
-        
-        const passwordMatch = await bCrypt.compare(clientData.password, client.dataValues.password);
-        if (!passwordMatch) return null;
-        
-        client = ClientsService.cleanClientData(client);
-        
-        const token = await this.getToken(client.dataValues);
-        if (!token) return null;
-
-        const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
-
-        return { ...client.dataValues, token, message };
-      }
-
-      let client: IClientData | null = await ClientModel.findOne({ where: { cpf: clientData.cpf } });
+      let client: IClientData | null = await ClientModel.findOne({
+        where: { cpf: clientData.cpf },
+        include: [
+          { model: PixModel, as: "receivedPix", attributes: [
+            'id',
+            'payerClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
+          { model: PixModel, as: "paidPix", attributes: [
+            'id',
+            'creditedClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
+        ],
+      });
       if (!client) return null;
 
       const passwordMatch = await bCrypt.compare(clientData.password, client.dataValues.password);
       if (!passwordMatch) return null;
-
+      
       client = ClientsService.cleanClientData(client);
 
-      const token = await this.getToken(client.dataValues);
+      const token = await this.getToken({
+        id: client.dataValues.id,
+        name: client.dataValues.name,
+        cpf: client.dataValues.cpf,
+        dataValues: client.dataValues
+      });
       if (!token) return null;
 
       const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
-
-      return { ...client.dataValues, token, message };
+      return { 
+        dataValues: client.dataValues,
+        token, 
+        message 
+      };
  
+    } catch (error) {
+      throw new Error((error as Error).message);
+    }
+  }
+
+  public testTokenIsActive = async (token: string): Promise<string | object> => {
+    try {
+      const decodedToken = await JsonWebToken.verify(token);
+      if (!decodedToken) return { message: 'Token inválido' };
+
+      return decodedToken;
     } catch (error) {
       throw new Error((error as Error).message);
     }
