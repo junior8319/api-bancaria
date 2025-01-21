@@ -11,7 +11,7 @@ class ClientsController {
   }
 
   public getAllClients = async (req: Request, res: Response) => {
-    const clients = await this.clientsService.getAllClients();    
+    const clients = await this.clientsService.getAllClients();
 
     if (clients && clients.length > 0) {      
       res.status(200).json(clients);
@@ -51,6 +51,24 @@ class ClientsController {
       res.status(200).json(client);
     } else {
       res.status(401).json({ message: 'Invalid credentials' });
+    }
+  }
+
+  public testTokenIsActive = async (req: Request, res: Response) => {
+    try {
+      const token = req.headers.authorization;
+      if (token) {
+        const tokenData = await this.clientsService.testTokenIsActive(token);
+        if (tokenData) {
+          res.status(200).json(tokenData);
+        } else {
+          res.status(401).json({ message: 'Token is invalid' });
+        }
+      } else {
+        res.status(400).json({ message: 'Token is missing' });
+      }
+    } catch (error) {
+      res.status(500).json(this.serverErrorMessage);
     }
   }
 }
