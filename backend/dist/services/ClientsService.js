@@ -25,8 +25,26 @@ class ClientsService {
                 const clients = yield Client_1.default.findAll({
                     attributes: { exclude: ['password'] },
                     include: [
-                        { model: Pix_1.default, as: "receivedPix", attributes: ['id', 'value', 'message', 'status'] },
-                        { model: Pix_1.default, as: "paidPix", attributes: ['id', 'value', 'message', 'status'] },
+                        { model: Pix_1.default, as: "receivedPix", attributes: [
+                                'id',
+                                'payerClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                        { model: Pix_1.default, as: "paidPix", attributes: [
+                                'id',
+                                'creditedClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
                     ],
                 });
                 if (!clients || clients.length === 0)
@@ -42,8 +60,98 @@ class ClientsService {
                 const client = yield Client_1.default.findByPk(id, {
                     attributes: { exclude: ['password'] },
                     include: [
-                        { model: Pix_1.default, as: "receivedPix", attributes: ['id', 'value', 'message', 'status', 'payerClientId'] },
-                        { model: Pix_1.default, as: "paidPix", attributes: ['id', 'value', 'message', 'status', 'creditedClientId'] },
+                        { model: Pix_1.default, as: "receivedPix", attributes: [
+                                'id',
+                                'payerClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                        { model: Pix_1.default, as: "paidPix", attributes: [
+                                'id',
+                                'creditedClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                    ],
+                });
+                if (!client)
+                    return null;
+                return client;
+            }
+            catch (error) {
+                throw new Error(error.message);
+            }
+        });
+        this.getClientByName = (name) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const client = yield Client_1.default.findOne({
+                    where: { name },
+                    attributes: { exclude: ['password'] },
+                    include: [
+                        { model: Pix_1.default, as: "receivedPix", attributes: [
+                                'id',
+                                'payerClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                        { model: Pix_1.default, as: "paidPix", attributes: [
+                                'id',
+                                'creditedClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                    ],
+                });
+                if (!client)
+                    return null;
+                return client;
+            }
+            catch (error) {
+                throw new Error(error.message);
+            }
+        });
+        this.getClientByCpf = (cpf) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const client = yield Client_1.default.findOne({
+                    where: { cpf },
+                    attributes: { exclude: ['password'] },
+                    include: [
+                        { model: Pix_1.default, as: "receivedPix", attributes: [
+                                'id',
+                                'payerClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                        { model: Pix_1.default, as: "paidPix", attributes: [
+                                'id',
+                                'creditedClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
                     ],
                 });
                 if (!client)
@@ -56,9 +164,35 @@ class ClientsService {
         });
         this.getToken = (client) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const clientData = yield Client_1.default.findOne({ where: { cpf: client.cpf } });
+                const clientData = yield Client_1.default.findOne({
+                    where: { cpf: client.cpf },
+                    attributes: { exclude: ['password'] },
+                    include: [
+                        { model: Pix_1.default, as: "receivedPix", attributes: [
+                                'id',
+                                'payerClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                        { model: Pix_1.default, as: "paidPix", attributes: [
+                                'id',
+                                'creditedClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                    ],
+                });
                 if (!clientData)
                     return null;
+                console.log('EM GETTOKEN:', clientData);
                 const token = yield jsonWebToken_1.default.generate({
                     dataValues: {
                         id: clientData.dataValues.id,
@@ -93,7 +227,15 @@ class ClientsService {
                 });
                 createdClient = _a.cleanClientData(createdClient);
                 const message = `Cliente cadastrado com sucesso! ID: ${createdClient.dataValues.id}`;
-                return Object.assign(Object.assign({}, createdClient.dataValues), { token, message });
+                return {
+                    dataValues: {
+                        id: createdClient.dataValues.id,
+                        name: createdClient.dataValues.name,
+                        cpf: createdClient.dataValues.cpf,
+                    },
+                    token,
+                    message
+                };
             }
             catch (error) {
                 throw new Error(error.message);
@@ -104,18 +246,25 @@ class ClientsService {
                 if (!clientData || (!clientData.cpf && !clientData.name) || !clientData.password)
                     return null;
                 if (!clientData.cpf) {
-                    let client = yield Client_1.default.findOne({ where: { name: clientData.name } });
+                    if (!clientData.name)
+                        return null;
+                    let client = yield this.getClientByName(clientData.name);
                     if (!client)
                         return null;
                     const passwordMatch = yield bCrypt.compare(clientData.password, client.dataValues.password);
                     if (!passwordMatch)
                         return null;
                     client = _a.cleanClientData(client);
-                    const token = yield this.getToken(client.dataValues);
+                    const token = yield this.getToken({
+                        id: client.dataValues.id,
+                        name: client.dataValues.name,
+                        cpf: client.dataValues.cpf,
+                        dataValues: client.dataValues
+                    });
                     if (!token)
                         return null;
                     const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
-                    return Object.assign(Object.assign({}, client.dataValues), { token, message });
+                    return { dataValues: Object.assign({}, client.dataValues), token, message };
                 }
                 let client = yield Client_1.default.findOne({ where: { cpf: clientData.cpf } });
                 if (!client)
@@ -124,11 +273,16 @@ class ClientsService {
                 if (!passwordMatch)
                     return null;
                 client = _a.cleanClientData(client);
-                const token = yield this.getToken(client.dataValues);
+                const token = yield this.getToken({
+                    id: client.dataValues.id,
+                    name: client.dataValues.name,
+                    cpf: client.dataValues.cpf,
+                    dataValues: client.dataValues
+                });
                 if (!token)
                     return null;
                 const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
-                return Object.assign(Object.assign({}, client.dataValues), { token, message });
+                return { dataValues: Object.assign({}, client.dataValues), token, message };
             }
             catch (error) {
                 throw new Error(error.message);
@@ -149,7 +303,7 @@ ClientsService.clientExists = (cpf) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 ClientsService.cleanClientData = (client) => {
-    delete client.dataValues.password;
+    console.log(client);
     delete client._previousDataValues;
     delete client.uniqno;
     delete client._changed;
