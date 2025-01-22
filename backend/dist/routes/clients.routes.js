@@ -13,4 +13,5 @@ clientsRouter.get("/clients/:id", ClientsController_1.default.getClientById);
 clientsRouter.post("/clients", ClientsController_1.default.createClient);
 clientsRouter.post("/login", ClientsController_1.default.login);
 clientsRouter.post("/pix", validateToken_1.default, PixController_1.default.createPix);
+clientsRouter.post("/test-token", validateToken_1.default, ClientsController_1.default.testTokenIsActive);
 exports.default = clientsRouter;

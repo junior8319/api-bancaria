@@ -54,6 +54,26 @@ class ClientsController {
                 res.status(401).json({ message: 'Invalid credentials' });
             }
         });
+        this.testTokenIsActive = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const token = req.headers.authorization;
+                if (token) {
+                    const tokenData = yield this.clientsService.testTokenIsActive(token);
+                    if (tokenData) {
+                        res.status(200).json(tokenData);
+                    }
+                    else {
+                        res.status(401).json({ message: 'Token is invalid' });
+                    }
+                }
+                else {
+                    res.status(400).json({ message: 'Token is missing' });
+                }
+            }
+            catch (error) {
+                res.status(500).json(this.serverErrorMessage);
+            }
+        });
         this.clientsService = new ClientsService_1.default();
     }
 }
