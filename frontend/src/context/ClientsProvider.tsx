@@ -1,15 +1,22 @@
 import React from "react";
 import { ReactNode, useEffect, useState } from "react"
 import { ClientData, PixToSend } from "../types/ClientData";
-import { requestClientLogin, requestGetClients, requestSendPix, requestTestTokenIsActive } from "../helpers/bankingApi.ts";
+import { requestClientLogin, requestGetClientById, requestGetClients, requestSendPix, requestTestTokenIsActive } from "../helpers/bankingApi.ts";
 import ClientsContext from "./Contexts.tsx";
+
+const initialPixToSend: PixToSend = {
+  creditedClientId: 0,
+  value: 0,
+  pixKey: '',
+  message: '',
+};
 
 const ClientsProvider = ({ children }: { children: ReactNode }) => {
   const [clients, setClients] = useState<ClientData[]>([]);
   const [client, setClient] = useState<ClientData | null>(null);
   const [cpf, setCpf] = useState('');
   const [password, setPassword] = useState('');
-  const [pixToSend, setPixToSend] = useState<PixToSend | null>(null);
+  const [pixToSend, setPixToSend] = useState<PixToSend | null>(initialPixToSend);
 
   const requestGetClientsFromApi = async () => {
     const data = await requestGetClients();
@@ -51,9 +58,18 @@ const ClientsProvider = ({ children }: { children: ReactNode }) => {
     event.preventDefault();
     
     if (pixToSend) {
-      const updatedPixtoSend = { ...pixToSend, payerClientId: client?.dataValues?.id };
+      const updatedPixtoSend = { ...pixToSend, payerClientId: client?.id };
       const response = await requestSendPix(updatedPixtoSend, client?.token || '');
-      
+
+      const clientDataUpdated = await requestGetClientById(client?.id || 0);
+      if (clientDataUpdated) {
+          const token = client?.token;
+          const dataValues = clientDataUpdated;
+          setClient({ ...dataValues, token });
+          localStorage.setItem('client', JSON.stringify({ ...dataValues, token }));
+          setPixToSend(initialPixToSend);
+      }
+
       return response;
     }
     alert('Pix data is missing');
@@ -109,6 +125,30 @@ const ClientsProvider = ({ children }: { children: ReactNode }) => {
     }
     
   }, []);
+
+  useEffect(() => {
+    if (client && client.dataValues && client.dataValues.id) {
+      requestGetClientById(client.dataValues?.id)
+      .then((response) => {
+        if (response) {
+          const token = client.token;
+          const dataValues = response;
+          setClient({ ...dataValues, token });
+          localStorage.setItem('client', JSON.stringify({ ...dataValues, token }));
+        }
+      });
+    } else if (client && client.id) {
+      requestGetClientById(client.id)
+      .then((response) => {
+        if (response) {
+          const token = client.token;
+          const dataValues = response;
+          setClient({ ...dataValues, token });
+          localStorage.setItem('client', JSON.stringify({ ...client, token }));
+        }
+      });
+    }
+  }, [client]);
 
   let mappedClients = (clients && clients.length && clients.length > 0)
   ?
