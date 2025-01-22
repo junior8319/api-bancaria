@@ -32,6 +32,8 @@ type ClientData = {
   cpf: string,
   createdAt: Date,
   updatedAt: Date,
+  receivedPix?: ReceivedPixData[],
+  paidPix?: PaidPixData[],
   dataValues?: {
     receivedPix?: ReceivedPixData[],
     paidPix?: PaidPixData[],
