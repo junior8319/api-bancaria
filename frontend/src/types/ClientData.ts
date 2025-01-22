@@ -19,11 +19,11 @@ type PaidPixData = {
 }
 
 type PixToSend = {
-  creditedClientId: number;
-  value: number;
-  pixKey: string;
+  creditedClientId?: number;
+  value?: number;
+  pixKey?: string;
   message?: string;
-  status: string;
+  status?: string;
 };
 
 type ClientData = {
@@ -40,7 +40,8 @@ type ClientData = {
     cpf: string,
     createdAt: Date,
     updatedAt: Date,
-  } 
+  },
+  token?: string
 };
 
 export type {
