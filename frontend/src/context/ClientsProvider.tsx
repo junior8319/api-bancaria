@@ -1,7 +1,7 @@
 import React from "react";
 import { ReactNode, useEffect, useState } from "react"
-import { ClientData } from "../types/ClientData";
-import { requestClientLogin, requestGetClients, requestTestTokenIsActive } from "../helpers/bankingApi.ts";
+import { ClientData, PixToSend } from "../types/ClientData";
+import { requestClientLogin, requestGetClients, requestSendPix, requestTestTokenIsActive } from "../helpers/bankingApi.ts";
 import ClientsContext from "./Contexts.tsx";
 
 const ClientsProvider = ({ children }: { children: ReactNode }) => {
@@ -9,6 +9,7 @@ const ClientsProvider = ({ children }: { children: ReactNode }) => {
   const [client, setClient] = useState<ClientData | null>(null);
   const [cpf, setCpf] = useState('');
   const [password, setPassword] = useState('');
+  const [pixToSend, setPixToSend] = useState<PixToSend | null>(null);
 
   const requestGetClientsFromApi = async () => {
     const data = await requestGetClients();
@@ -23,6 +24,11 @@ const ClientsProvider = ({ children }: { children: ReactNode }) => {
         setPassword(value);
       }
     };
+
+  const handlePixInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setPixToSend({ ...pixToSend, [name]: value });
+  }
 
   const sendLoginRequest = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -40,6 +46,19 @@ const ClientsProvider = ({ children }: { children: ReactNode }) => {
     
     return response;
   };
+
+  const sendPixRequest = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    
+    if (pixToSend) {
+      const updatedPixtoSend = { ...pixToSend, payerClientId: client?.dataValues?.id };
+      const response = await requestSendPix(updatedPixtoSend, client?.token || '');
+      
+      return response;
+    }
+    alert('Pix data is missing');
+    return null;
+  }
 
   const formatDateInBrasilia = (date: Date): string => {
     const dateObj = new Date(date);
@@ -111,6 +130,10 @@ const ClientsProvider = ({ children }: { children: ReactNode }) => {
     setPassword,
     formatDateInBrasilia,
     formatTimeInBrasilia,
+    pixToSend,
+    setPixToSend,
+    handlePixInputChange,
+    sendPixRequest,
   };
 
   return (
