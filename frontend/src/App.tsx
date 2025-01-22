@@ -7,11 +7,16 @@ const App = () => {
   const context = useContext(ClientsContext);
   const client = context?.client || null;
   const clients = context?.clients || [];
+  const pixToSend = context?.pixToSend || null;
+  const sendPixRequest = context?.sendPixRequest;
+  const handlePixInputChange = context?.handlePixInputChange;
   const formatDateInBrasilia = context?.formatDateInBrasilia;
   const formatTimeInBrasilia = context?.formatTimeInBrasilia;
 
   const clientLogged = JSON.parse(localStorage.getItem('client') || '{}');
-  const isLoggedIn = (clientLogged.token && clientLogged.token.length > 0) ? true : false;  
+  const isLoggedIn = (clientLogged.token && clientLogged.token.length > 0) ? true : false;
+
+  const clientsWithoutLoggedClient = clients.filter((person) => client && person.id !== client.dataValues?.id);
   
   return (
     (client && isLoggedIn)
@@ -103,24 +108,95 @@ const App = () => {
         <div>
           <h2>Transferir Pix</h2>
           <form>
-            <p>
-              <label htmlFor="pixKey">Chave Pix</label>
-              <input type="text" id="pixKey" name="pixKey" />
-            </p>
+            <div>
+              <p>
+                <label
+                  htmlFor="creditedClientId"
+                >
+                  ID do cliente
+                </label>
+                <input
+                  list="clientsDataList"
+                  name="creditedClientId"
+                  type="number"
+                  id="creditedClientId"
+                  value={pixToSend?.creditedClientId}
+                  onChange={handlePixInputChange}
+                  required
+                />
+                <datalist
+                  id="clientsDataList"
+                >
+                  { clientsWithoutLoggedClient.map((person) => {
+                    return (
+                      <option
+                        key={person.id}
+                        value={person.id}
+                      >
+                        {person.name}
+                      </option>
+                    );
+                  }) }
+                </datalist>
+              </p>    
 
-            <p>
-              <label htmlFor="value">Valor</label>
-              <input type="number" id="value" name="value" />
-            </p>
+              <p>
+                <label
+                  htmlFor="pixKey"
+                >
+                  Chave Pix
+                </label>
+                <input
+                  type="text"
+                  id="pixKey"
+                  name="pixKey"
+                  value={pixToSend?.pixKey}
+                  onChange={handlePixInputChange}
+                  required
+                />
+              </p>
 
-            <p>
-              <label htmlFor="message">Mensagem</label>
-              <input type="text" id="message" name="message" />
-            </p>
+              <p>
+                <label
+                  htmlFor="value"
+                >
+                  Valor
+                </label>
+                <input
+                  type="number"
+                  id="value"
+                  name="value"
+                  value={pixToSend?.value}
+                  onChange={handlePixInputChange}
+                  required
+                />
+              </p>
 
-            <p>
-              <button>Transferir</button>
-            </p>
+              <p>
+                <label
+                  htmlFor="message"
+                >
+                  Mensagem
+                </label>
+                <input
+                  type="text"
+                  id="message"
+                  name="message"
+                  value={pixToSend?.message}
+                  onChange={handlePixInputChange}
+                  required
+                />
+              </p>
+            </div>
+            <div>
+              <p>
+                <button
+                  onClick={sendPixRequest}
+                >
+                  Transferir
+                </button>
+              </p>
+            </div>
           </form>
         </div>
       </div>
