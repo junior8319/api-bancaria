@@ -93,12 +93,12 @@ const requestClientLogin = async (loginData: { cpf: string, password: string }) 
   }  
 };
 
-const requestSendPix = async (pixData: PixToSend) => {
-  try { 
+const requestSendPix = async (pixData: PixToSend, token: string) => {
+  try {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': `${localStorage.getItem('client')}`,
+      'Authorization': token,
     };
 
     if (API_ORIGIN) {
@@ -117,7 +117,7 @@ const requestSendPix = async (pixData: PixToSend) => {
     .then(data => {
       return data;
     });
-
+    
     return response;
   } catch (error) {
     console.error(error);
@@ -125,12 +125,12 @@ const requestSendPix = async (pixData: PixToSend) => {
   }
 };
 
-const requestTestTokenIsActive = async (token: string) => {
+const requestTestTokenIsActive = async (token: string | undefined) => {
   try {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': token,
+      'Authorization': token || '',
     };
 
     if (API_ORIGIN) {
