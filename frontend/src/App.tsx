@@ -16,7 +16,7 @@ const App = () => {
   const clientLogged = JSON.parse(localStorage.getItem('client') || '{}');
   const isLoggedIn = (clientLogged.token && clientLogged.token.length > 0) ? true : false;
 
-  const clientsWithoutLoggedClient = clients.filter((person) => client && person.id !== client.dataValues?.id);
+  const clientsWithoutLoggedClient = clients.filter((person) => client && person.id !== client?.id);  
   
   return (
     (client && isLoggedIn)
@@ -25,7 +25,7 @@ const App = () => {
         <header>
           <div className="bg-yellow-500">
             <h1>API de Pix</h1>
-            <p>Olá, { client.dataValues?.name }</p>
+            <p>Olá, { client?.name }</p>
           </div>
         </header>
 
@@ -33,7 +33,7 @@ const App = () => {
           <h2>Lista de Pix</h2>
           <div>
             <h3>Recebidos</h3>
-            { client.dataValues?.receivedPix?.length === 0
+            { client?.receivedPix?.length === 0
             ? 
               <p>Nenhum Pix recebido</p>
             :
@@ -49,7 +49,7 @@ const App = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  { client.dataValues?.receivedPix?.map((pix) => {
+                  { client?.receivedPix?.map((pix) => {
                     const payerClientName = clients.find((person) => person.id === pix.payerClientId)?.name;
                     return (
                       <tr key={pix.id}>
@@ -69,7 +69,7 @@ const App = () => {
 
           <div>
             <h3>Enviados</h3>
-            { client.dataValues?.paidPix?.length === 0
+            { client?.paidPix?.length === 0
             ?
               <p>Nenhum Pix enviado</p>
             :
@@ -85,7 +85,7 @@ const App = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  { client.dataValues?.paidPix?.map((pix) => {
+                  { client?.paidPix?.map((pix) => {
                     const creditedClientName = clients.find((person) => person.id === pix.creditedClientId)?.name;
                     
                     return (
