@@ -127,6 +127,42 @@ class ClientsService {
                 throw new Error(error.message);
             }
         });
+        this.getClientByCpf = (cpf) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const client = yield Client_1.default.findOne({
+                    where: { cpf },
+                    attributes: { exclude: ['password'] },
+                    include: [
+                        { model: Pix_1.default, as: "receivedPix", attributes: [
+                                'id',
+                                'payerClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                        { model: Pix_1.default, as: "paidPix", attributes: [
+                                'id',
+                                'creditedClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                    ],
+                });
+                if (!client)
+                    return null;
+                return client;
+            }
+            catch (error) {
+                throw new Error(error.message);
+            }
+        });
         this.getToken = (client) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const clientData = yield Client_1.default.findOne({
@@ -252,11 +288,8 @@ class ClientsService {
                 if (!token)
                     return null;
                 const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
-                return {
-                    dataValues: client.dataValues,
-                    token,
-                    message
-                };
+                return Object.assign(Object.assign({}, client), { token,
+                    message });
             }
             catch (error) {
                 throw new Error(error.message);
