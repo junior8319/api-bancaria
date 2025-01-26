@@ -18,6 +18,8 @@ type ClientsContextType = {
   setPixToSend: (pixToSend: PixToSend) => void,
   handlePixInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
   sendPixRequest: (event: React.MouseEvent<HTMLButtonElement>) => Promise<any>,
+  isLoggedIn: boolean,
+  setIsLoggedIn: (isLoggedIn: boolean) => void,
 }
 
 export type { ClientsContextType };
