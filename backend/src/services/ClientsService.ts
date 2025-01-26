@@ -122,6 +122,41 @@ class ClientsService {
     }
   }
 
+  public getClientByCpf = async (cpf: string): Promise<IClient | null> => {
+    try {
+      const client: IClient | null = await ClientModel.findOne({
+        where: { cpf },
+        attributes: { exclude: ['password'] },
+        include: [
+          { model: PixModel, as: "receivedPix", attributes: [
+            'id',
+            'payerClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
+          { model: PixModel, as: "paidPix", attributes: [
+            'id',
+            'creditedClientId',
+            'pixKey',
+            'value',
+            'message',
+            'status',
+            'createdAt',
+            'updatedAt'
+          ] },
+        ],
+      });
+
+      if (!client) return null;
+      return client;
+    } catch (error) {
+      throw new Error((error as Error).message);
+    }
+  }
   static clientExists = async (cpf: string): Promise<boolean> => {
     try {
       const client = await ClientModel.findOne({ where: { cpf } });
@@ -280,7 +315,7 @@ class ClientsService {
 
       const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
       return { 
-        dataValues: client.dataValues,
+        ...client,
         token, 
         message 
       };
