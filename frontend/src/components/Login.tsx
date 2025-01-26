@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import ClientsContext from "../context/Contexts.tsx";
 import React from "react";
+import "../styles/login.styles.css"
 
 const Login = () => {
   const context = useContext(ClientsContext);
@@ -10,14 +11,14 @@ const Login = () => {
   const sendLoginRequest = context?.sendLoginRequest;
 
   return (
-    <main className="flex items-center justify-center min-h-screen">
-      <section className="w-full max-w-sm bg-slate-600 shadow-lg rounded-2xl p-6">
-        <h1 className="text-2xl font-bold text-center mb-6">API de Pix</h1>
+    <main className="container-login">
+      <section className="section-login">
+        <h1 className="title-login">API de Pix</h1>
         <form>
           <div className="mb-4">
             <label
               htmlFor="cpf"
-              className="block text-sm font-medium text-green-500"
+              className="label-login"
             >
               CPF
             </label>
@@ -27,14 +28,14 @@ const Login = () => {
               name="cpf"
               value={cpf}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-800"
+              className="input-login"
             />
           </div>
           
           <div className="mb-6">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-green-500"
+              className="label-login"
             >
               Senha
             </label>
@@ -44,14 +45,14 @@ const Login = () => {
               name="password"
               value={password}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-800"
+              className="input-login"
             />
           </div>
 
           <div>
             <button
               onClick={sendLoginRequest}
-              className="w-full px-4 py-2 text-white bg-blue-600 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-transparent hover:border-[#1ED760] hover:text-[#1ED760] transition duration-500"
+              className="btn-login"
             >
               Login
             </button>
