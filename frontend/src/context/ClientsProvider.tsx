@@ -1,7 +1,7 @@
 import React from "react";
 import { ReactNode, useEffect, useState } from "react"
 import { ClientData, PixToSend } from "../types/ClientData";
-import { requestClientLogin, requestGetClientById, requestGetClients, requestSendPix, requestTestTokenIsActive } from "../helpers/bankingApi.ts";
+import { requestClientLogin, requestGetClientByCpf, requestGetClients, requestSendPix, requestTestTokenIsActive } from "../helpers/bankingApi.ts";
 import ClientsContext from "./Contexts.tsx";
 
 const initialPixToSend: PixToSend = {
@@ -16,6 +16,7 @@ const ClientsProvider = ({ children }: { children: ReactNode }) => {
   const [client, setClient] = useState<ClientData | null>(null);
   const [cpf, setCpf] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [pixToSend, setPixToSend] = useState<PixToSend | null>(initialPixToSend);
 
   const requestGetClientsFromApi = async () => {
@@ -49,6 +50,9 @@ const ClientsProvider = ({ children }: { children: ReactNode }) => {
     if (response && response.token) {
       setClient(response);
       localStorage.setItem('client', JSON.stringify(response));
+      setCpf && setCpf('');
+      setPassword && setPassword('');
+      setIsLoggedIn && setIsLoggedIn(true);
     }
     
     return response;
@@ -61,12 +65,11 @@ const ClientsProvider = ({ children }: { children: ReactNode }) => {
       const updatedPixtoSend = { ...pixToSend, payerClientId: client?.id };
       const response = await requestSendPix(updatedPixtoSend, client?.token || '');
 
-      const clientDataUpdated = await requestGetClientById(client?.id || 0);
+      const clientDataUpdated = await requestGetClientByCpf(client?.cpf || "");
       if (clientDataUpdated) {
           const token = client?.token;
-          const dataValues = clientDataUpdated;
-          setClient({ ...dataValues, token });
-          localStorage.setItem('client', JSON.stringify({ ...dataValues, token }));
+          setClient({ ...clientDataUpdated, token });
+          localStorage.setItem('client', JSON.stringify({ ...clientDataUpdated, token }));
           setPixToSend(initialPixToSend);
       }
 
@@ -125,31 +128,6 @@ const ClientsProvider = ({ children }: { children: ReactNode }) => {
     }
     
   }, []);
-
-  useEffect(() => {
-    if (client && client.dataValues && client.dataValues.id) {
-      requestGetClientById(client.dataValues?.id)
-      .then((response) => {
-        if (response) {
-          const token = client.token;
-          const dataValues = response;
-          setClient({ ...dataValues, token });
-          localStorage.setItem('client', JSON.stringify({ ...dataValues, token }));
-        }
-      });
-    } else if (client && client.id) {
-      requestGetClientById(client.id)
-      .then((response) => {
-        if (response) {
-          const token = client.token;
-          const dataValues = response;
-          setClient({ ...dataValues, token });
-          localStorage.setItem('client', JSON.stringify({ ...client, token }));
-        }
-      });
-    }
-  }, [client]);
-
   let mappedClients = (clients && clients.length && clients.length > 0)
   ?
     clients.map((client) => client)
@@ -174,6 +152,8 @@ const ClientsProvider = ({ children }: { children: ReactNode }) => {
     setPixToSend,
     handlePixInputChange,
     sendPixRequest,
+    isLoggedIn,
+    setIsLoggedIn,
   };
 
   return (
