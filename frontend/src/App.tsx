@@ -2,34 +2,60 @@ import { useContext } from "react";
 import ClientsContext from "./context/Contexts.tsx";
 import React from "react";
 import Login from "./components/Login.tsx";
+import { ClientData } from "./types/ClientData.ts";
+import "./styles/app.styles.css";
 
 const App = () => {
   const context = useContext(ClientsContext);
   const client = context?.client || null;
+  const setClient = context?.setClient;
   const clients = context?.clients || [];
   const pixToSend = context?.pixToSend || null;
+  const isLoggedIn = context?.isLoggedIn;
+  const setIsLoggedIn = context?.setIsLoggedIn;
   const sendPixRequest = context?.sendPixRequest;
   const handlePixInputChange = context?.handlePixInputChange;
   const formatDateInBrasilia = context?.formatDateInBrasilia;
   const formatTimeInBrasilia = context?.formatTimeInBrasilia;
 
-  const clientLogged = JSON.parse(localStorage.getItem('client') || '{}');
-  const isLoggedIn = (clientLogged.token && clientLogged.token.length > 0) ? true : false;
+  const contextClientLoggedOff: ClientData = {
+    id: 0,
+    name: '',
+    cpf: '',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    receivedPix: [],
+    paidPix: [],
+    token: '',
+    message: '',
+  };
 
-  const clientsWithoutLoggedClient = clients.filter((person) => client && person.id !== client?.id);  
+  const clientsWithoutLoggedClient = clients.filter((person) => client && person.id !== client?.id);
   
   return (
     (client && isLoggedIn)
     ?
-      <div>
-        <header>
-          <div className="bg-yellow-500">
+      <main className="body">
+        <header className="header">
+          <section>
             <h1>API de Pix</h1>
             <p>Olá, { client?.name }</p>
-          </div>
+          </section>
+          <section>
+            <button
+              onClick={() => {
+                localStorage.removeItem('client');
+                setClient && setClient(contextClientLoggedOff);
+                setIsLoggedIn && setIsLoggedIn(false);
+              }}
+              className="button button-danger"
+            >
+              Sair
+            </button>
+          </section>
         </header>
 
-        <div>
+        <section className="section">
           <h2>Lista de Pix</h2>
           <div>
             <h3>Recebidos</h3>
@@ -37,7 +63,7 @@ const App = () => {
             ? 
               <p>Nenhum Pix recebido</p>
             :
-              <table>
+              <table className="table">
                 <thead>
                   <tr>
                     <th>Data</th>
@@ -73,7 +99,7 @@ const App = () => {
             ?
               <p>Nenhum Pix enviado</p>
             :
-              <table>
+              <table className="table">
                 <thead>
                   <tr>
                     <th>Data</th>
@@ -103,9 +129,9 @@ const App = () => {
               </table>
             }
           </div>
-        </div>
+        </section>
 
-        <div>
+        <section className="form">
           <h2>Transferir Pix</h2>
           <form>
             <div>
@@ -198,8 +224,8 @@ const App = () => {
               </p>
             </div>
           </form>
-        </div>
-      </div>
+        </section>
+      </main>
     :
       <Login />
   );

@@ -52,6 +52,7 @@ class ClientsService {
                 return clients;
             }
             catch (error) {
+                console.log(error);
                 throw new Error(error.message);
             }
         });
@@ -192,7 +193,6 @@ class ClientsService {
                 });
                 if (!clientData)
                     return null;
-                console.log('EM GETTOKEN:', clientData);
                 const token = yield jsonWebToken_1.default.generate({
                     dataValues: {
                         id: clientData.dataValues.id,
@@ -243,30 +243,36 @@ class ClientsService {
         });
         this.login = (clientData) => __awaiter(this, void 0, void 0, function* () {
             try {
-                if (!clientData || (!clientData.cpf && !clientData.name) || !clientData.password)
+                if (!clientData ||
+                    !clientData.cpf ||
+                    !clientData.password ||
+                    clientData.cpf.length < 13)
                     return null;
-                if (!clientData.cpf) {
-                    if (!clientData.name)
-                        return null;
-                    let client = yield this.getClientByName(clientData.name);
-                    if (!client)
-                        return null;
-                    const passwordMatch = yield bCrypt.compare(clientData.password, client.dataValues.password);
-                    if (!passwordMatch)
-                        return null;
-                    client = _a.cleanClientData(client);
-                    const token = yield this.getToken({
-                        id: client.dataValues.id,
-                        name: client.dataValues.name,
-                        cpf: client.dataValues.cpf,
-                        dataValues: client.dataValues
-                    });
-                    if (!token)
-                        return null;
-                    const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
-                    return { dataValues: Object.assign({}, client.dataValues), token, message };
-                }
-                let client = yield Client_1.default.findOne({ where: { cpf: clientData.cpf } });
+                let client = yield Client_1.default.findOne({
+                    where: { cpf: clientData.cpf },
+                    include: [
+                        { model: Pix_1.default, as: "receivedPix", attributes: [
+                                'id',
+                                'payerClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                        { model: Pix_1.default, as: "paidPix", attributes: [
+                                'id',
+                                'creditedClientId',
+                                'pixKey',
+                                'value',
+                                'message',
+                                'status',
+                                'createdAt',
+                                'updatedAt'
+                            ] },
+                    ],
+                });
                 if (!client)
                     return null;
                 const passwordMatch = yield bCrypt.compare(clientData.password, client.dataValues.password);
@@ -282,7 +288,19 @@ class ClientsService {
                 if (!token)
                     return null;
                 const message = `Login efetuado com sucesso! Boas vindas, ${client.dataValues.name}!`;
-                return { dataValues: Object.assign({}, client.dataValues), token, message };
+                return Object.assign(Object.assign({}, client), { token,
+                    message });
+            }
+            catch (error) {
+                throw new Error(error.message);
+            }
+        });
+        this.testTokenIsActive = (token) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const decodedToken = yield jsonWebToken_1.default.verify(token);
+                if (!decodedToken)
+                    return { message: 'Token inválido' };
+                return decodedToken;
             }
             catch (error) {
                 throw new Error(error.message);
@@ -303,7 +321,7 @@ ClientsService.clientExists = (cpf) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 ClientsService.cleanClientData = (client) => {
-    console.log(client);
+    delete client.dataValues.password;
     delete client._previousDataValues;
     delete client.uniqno;
     delete client._changed;

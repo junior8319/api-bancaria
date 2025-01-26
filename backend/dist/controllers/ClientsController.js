@@ -34,6 +34,14 @@ class ClientsController {
                 res.status(404).json({ message: `Client with id ${id} not found` });
             }
         });
+        this.getClientByCpf = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const cpf = req.query.cpf;
+            const client = yield this.clientsService.getClientByCpf(cpf);
+            if (!client || !client.id) {
+                res.status(404).json({ message: `Client with CPF ${cpf} not found` });
+            }
+            res.status(200).json(client);
+        });
         this.createClient = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const clientData = req.body;
             const client = yield this.clientsService.createClient(clientData);
@@ -52,6 +60,26 @@ class ClientsController {
             }
             else {
                 res.status(401).json({ message: 'Invalid credentials' });
+            }
+        });
+        this.testTokenIsActive = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const token = req.headers.authorization;
+                if (token) {
+                    const tokenData = yield this.clientsService.testTokenIsActive(token);
+                    if (tokenData) {
+                        res.status(200).json(tokenData);
+                    }
+                    else {
+                        res.status(401).json({ message: 'Token is invalid' });
+                    }
+                }
+                else {
+                    res.status(400).json({ message: 'Token is missing' });
+                }
+            }
+            catch (error) {
+                res.status(500).json(this.serverErrorMessage);
             }
         });
         this.clientsService = new ClientsService_1.default();
