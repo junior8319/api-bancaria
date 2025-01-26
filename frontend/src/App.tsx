@@ -2,21 +2,34 @@ import { useContext } from "react";
 import ClientsContext from "./context/Contexts.tsx";
 import React from "react";
 import Login from "./components/Login.tsx";
+import { ClientData } from "./types/ClientData.ts";
 
 const App = () => {
   const context = useContext(ClientsContext);
   const client = context?.client || null;
+  const setClient = context?.setClient;
   const clients = context?.clients || [];
   const pixToSend = context?.pixToSend || null;
+  const isLoggedIn = context?.isLoggedIn;
+  const setIsLoggedIn = context?.setIsLoggedIn;
   const sendPixRequest = context?.sendPixRequest;
   const handlePixInputChange = context?.handlePixInputChange;
   const formatDateInBrasilia = context?.formatDateInBrasilia;
   const formatTimeInBrasilia = context?.formatTimeInBrasilia;
 
-  const clientLogged = JSON.parse(localStorage.getItem('client') || '{}');
-  const isLoggedIn = (clientLogged.token && clientLogged.token.length > 0) ? true : false;
+  const contextClientLoggedOff: ClientData = {
+    id: 0,
+    name: '',
+    cpf: '',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    receivedPix: [],
+    paidPix: [],
+    token: '',
+    message: '',
+  };
 
-  const clientsWithoutLoggedClient = clients.filter((person) => client && person.id !== client?.id);  
+  const clientsWithoutLoggedClient = clients.filter((person) => client && person.id !== client?.id);
   
   return (
     (client && isLoggedIn)
@@ -26,6 +39,17 @@ const App = () => {
           <div className="bg-yellow-500">
             <h1>API de Pix</h1>
             <p>Olá, { client?.name }</p>
+          </div>
+          <div className="bg-yellow-500">
+            <button
+              onClick={() => {
+                localStorage.removeItem('client');
+                setClient && setClient(contextClientLoggedOff);
+                setIsLoggedIn && setIsLoggedIn(false);
+              }}
+            >
+              Sair
+            </button>
           </div>
         </header>
 
