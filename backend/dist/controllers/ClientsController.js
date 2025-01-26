@@ -34,6 +34,14 @@ class ClientsController {
                 res.status(404).json({ message: `Client with id ${id} not found` });
             }
         });
+        this.getClientByCpf = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const cpf = req.query.cpf;
+            const client = yield this.clientsService.getClientByCpf(cpf);
+            if (!client || !client.id) {
+                res.status(404).json({ message: `Client with CPF ${cpf} not found` });
+            }
+            res.status(200).json(client);
+        });
         this.createClient = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const clientData = req.body;
             const client = yield this.clientsService.createClient(clientData);

@@ -28,7 +28,17 @@ const requestGetClientById = async (clientId: number) => {
   }
 };
 
+const requestGetClientByCpf = async (cpf: string) => {
+  try {
+    const response = await fetch(`${API_URL}/clients/cpf?cpf=${cpf}`);
+    const clientJson = await response.json();
 
+    return clientJson;
+  } catch (error) {
+    console.error(error);
+    return new Error(`An error occurred while fetching client ${error}`);
+  }
+}
 const requestClientRegister = async (clientData: ClientData) => {
   try {
     const headers: Record<string, string> = {
@@ -83,7 +93,7 @@ const requestClientLogin = async (loginData: { cpf: string, password: string }) 
     const response = await fetch(`${API_URL}/login`, options)
     .then((response) => response.json())
     .then(data => {
-      return data;
+      return { ...data.dataValues, token: data.token, message: data.message };
     });
 
     return response;
@@ -162,5 +172,6 @@ export {
   requestClientRegister,
   requestClientLogin,
   requestSendPix,
-  requestTestTokenIsActive
+  requestTestTokenIsActive,
+  requestGetClientByCpf,
 }

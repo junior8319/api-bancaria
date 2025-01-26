@@ -32,6 +32,15 @@ class ClientsController {
     }
   }
 
+  public getClientByCpf = async (req: Request, res: Response) => {
+    const cpf = req.query.cpf as string;
+    const client = await this.clientsService.getClientByCpf(cpf);
+    if (!client || !client.id) {
+      res.status(404).json({ message: `Client with CPF ${cpf} not found` });
+    }
+    res.status(200).json(client);
+  }
+
   public createClient = async (req: Request, res: Response) => {
     const clientData: IClient = req.body;
     const client = await this.clientsService.createClient(clientData);

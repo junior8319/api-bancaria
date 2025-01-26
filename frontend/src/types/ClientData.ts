@@ -42,13 +42,14 @@ type ClientData = {
     cpf: string,
     createdAt: Date,
     updatedAt: Date,
+    message?: string
   },
-  token?: string
+  token?: string,
+  message?: string
 };
-
 export type {
   ReceivedPixData,
   PaidPixData,
   ClientData,
-  PixToSend
+  PixToSend,
 };

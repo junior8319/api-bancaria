@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import ClientsContext from "../context/Contexts.tsx";
 import React from "react";
+import "../styles/login.styles.css"
 
 const Login = () => {
   const context = useContext(ClientsContext);
@@ -10,24 +11,55 @@ const Login = () => {
   const sendLoginRequest = context?.sendLoginRequest;
 
   return (
-    <div>
-      <h1>API de Pix</h1>
-      <form>
-        <p className="text-center">
-          <label htmlFor="cpf">CPF</label>
-          <input type="text" id="cpf" name="cpf" value={cpf} onChange={handleInputChange} />
-        </p>
+    <main className="container-login">
+      <section className="section-login">
+        <h1 className="title-login">API de Pix</h1>
+        <form>
+          <div className="mb-4">
+            <label
+              htmlFor="cpf"
+              className="label-login"
+            >
+              CPF
+            </label>
+            <input
+              type="text"
+              id="cpf"
+              name="cpf"
+              value={cpf}
+              onChange={handleInputChange}
+              className="input-login"
+            />
+          </div>
+          
+          <div className="mb-6">
+            <label
+              htmlFor="password"
+              className="label-login"
+            >
+              Senha
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={handleInputChange}
+              className="input-login"
+            />
+          </div>
 
-        <p className="text-center">
-          <label htmlFor="password">Senha</label>
-          <input type="password" id="password" name="password" value={password} onChange={handleInputChange} />
-        </p>
-
-        <p className="text-center">
-          <button onClick={sendLoginRequest}>Login</button>
-        </p>
-      </form>
-    </div>
+          <div>
+            <button
+              onClick={sendLoginRequest}
+              className="btn-login"
+            >
+              Login
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
   );
 };
 
