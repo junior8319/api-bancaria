@@ -1,0 +1,23 @@
+.btn-login {
+  @apply w-full px-4 py-2 text-white bg-blue-600 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-transparent hover:border-[#1ED760] hover:text-[#1ED760] transition duration-500
+}
+
+.input-login {
+  @apply w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-800
+}
+
+.container-login {
+  @apply flex items-center justify-center min-h-screen
+}
+
+.section-login {
+  @apply w-full max-w-sm bg-slate-600 shadow-lg rounded-2xl p-6
+}
+
+.title-login {
+  @apply text-2xl font-bold text-center mb-6 text-[#1ED760]
+}
+
+.label-login {
+  @apply block text-sm font-medium text-[#1ED760]
+}
