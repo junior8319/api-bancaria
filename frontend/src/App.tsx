@@ -3,6 +3,7 @@ import ClientsContext from "./context/Contexts.tsx";
 import React from "react";
 import Login from "./components/Login.tsx";
 import { ClientData } from "./types/ClientData.ts";
+import "./styles/app.styles.css";
 
 const App = () => {
   const context = useContext(ClientsContext);
@@ -34,26 +35,27 @@ const App = () => {
   return (
     (client && isLoggedIn)
     ?
-      <div>
-        <header>
-          <div className="bg-yellow-500">
+      <main className="body">
+        <header className="header">
+          <section>
             <h1>API de Pix</h1>
             <p>Olá, { client?.name }</p>
-          </div>
-          <div className="bg-yellow-500">
+          </section>
+          <section>
             <button
               onClick={() => {
                 localStorage.removeItem('client');
                 setClient && setClient(contextClientLoggedOff);
                 setIsLoggedIn && setIsLoggedIn(false);
               }}
+              className="button button-danger"
             >
               Sair
             </button>
-          </div>
+          </section>
         </header>
 
-        <div>
+        <section className="section">
           <h2>Lista de Pix</h2>
           <div>
             <h3>Recebidos</h3>
@@ -61,7 +63,7 @@ const App = () => {
             ? 
               <p>Nenhum Pix recebido</p>
             :
-              <table>
+              <table className="table">
                 <thead>
                   <tr>
                     <th>Data</th>
@@ -97,7 +99,7 @@ const App = () => {
             ?
               <p>Nenhum Pix enviado</p>
             :
-              <table>
+              <table className="table">
                 <thead>
                   <tr>
                     <th>Data</th>
@@ -127,9 +129,9 @@ const App = () => {
               </table>
             }
           </div>
-        </div>
+        </section>
 
-        <div>
+        <section className="form">
           <h2>Transferir Pix</h2>
           <form>
             <div>
@@ -222,8 +224,8 @@ const App = () => {
               </p>
             </div>
           </form>
-        </div>
-      </div>
+        </section>
+      </main>
     :
       <Login />
   );
