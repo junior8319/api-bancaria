@@ -1,13 +1,17 @@
 # backend/Dockerfile
-FROM node:22-alpine
+FROM node:18
 
-WORKDIR /api-bancaria
+RUN apt-get update && apt-get install -y python3 python3-pip build-essential
 
-COPY package*.json ./backend
+RUN apt install -y build-essential
+
+WORKDIR /api-bancaria/backend
+
+COPY package*.json .
 
 RUN npm install
 
-COPY . ./backend
+COPY . .
 
 EXPOSE 3001
 
