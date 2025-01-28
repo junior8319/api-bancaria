@@ -1,12 +1,12 @@
-FROM node:22-alpine
+FROM node:18
 
-WORKDIR /api-bancaria
+WORKDIR /api-bancaria/frontend
 
-COPY package*.json ./frontend
+COPY package*.json .
 
 RUN npm install
 
-COPY . ./frontend
+COPY . .
 
 EXPOSE 3000
 
