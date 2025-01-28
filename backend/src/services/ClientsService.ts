@@ -2,7 +2,7 @@ import ClientModel from "../database/models/Client";
 import PixModel from "../database/models/Pix";
 import IClient, { IClientData, ILogin } from '../interfaces/ClientData';
 import JsonWebToken from "../helpers/jsonWebToken";
-const bCrypt = require('bcrypt');
+const bCrypt = require('bcryptjs');
 
 class ClientsService {
   static model: ClientModel;
