@@ -10,6 +10,10 @@ class App {
     this.app.get('/', (_req, res): void => {
       res.send('Hello World')
     });
+
+    this.app.get('/health', (_req, res): void => {
+      res.send('Server is up and running');
+    });
     this.app.use(clientsRouter);
   }
 
@@ -32,7 +36,7 @@ class App {
       console.log(`Error: ${error}`);
       console.log('Failed to start the server');
     }
-  }         
+  }
 }
 
 export default App;
